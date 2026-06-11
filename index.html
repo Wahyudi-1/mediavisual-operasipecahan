@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="Aplikasi Simulasi Operasi Pecahan Visual yang interaktif dan mendukung akses offline.">
     <title>Simulasi Operasi Pecahan Visual</title>
     <style>
         /* Desain Modern Variabel CSS */
@@ -15,7 +17,6 @@
             --text-main: #1F2937;
             --text-muted: #6B7280;
             --border: #E5E7EB;
-            --block-bg: #E5E7EB;
         }
 
         * {
@@ -32,7 +33,7 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
         }
 
@@ -40,25 +41,68 @@
             background-color: var(--surface);
             width: 100%;
             max-width: 1100px;
-            padding: 30px;
+            padding: 25px 30px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        /* Navigasi / Kontrol Atas */
+        .top-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .control-btn:hover {
+            background: #F9FAFB;
+            border-color: #D1D5DB;
+        }
+
+        .control-btn.primary-btn {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
+        }
+
+        .control-btn.primary-btn:hover {
+            background: #4338CA;
+            transform: translateY(-1px);
         }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         h1 {
             color: var(--primary);
-            font-size: 2.2rem;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
 
         p.subtitle {
             color: var(--text-muted);
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin-bottom: 0;
         }
 
@@ -75,7 +119,7 @@
             font-weight: 600;
             color: var(--text-muted);
             text-transform: uppercase;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 0.5px;
         }
 
@@ -92,8 +136,8 @@
         }
 
         .toggle-btn {
-            padding: 10px 15px;
-            font-size: 1rem;
+            padding: 10px 5px;
+            font-size: 0.95rem;
             font-weight: 600;
             color: var(--text-muted);
             background: transparent;
@@ -102,9 +146,6 @@
             cursor: pointer;
             transition: all 0.2s;
             text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
 
         .toggle-btn.active {
@@ -114,7 +155,6 @@
             transform: translateY(-2px);
         }
 
-        /* Tipe Visual Toggle Mini (Per Kartu) */
         .visual-toggle-mini {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -131,12 +171,11 @@
             background: transparent;
             padding: 6px 10px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.2s;
-            flex: 1;
         }
 
         .mini-btn.active {
@@ -145,40 +184,53 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Pembungkus Scroll Horizontal (Agar bacaan tetap kiri ke kanan di HP) */
+        /* Pembungkus Scroll Horizontal (Untuk Desktop Layout) */
         .equation-scroll-wrapper {
             width: 100%;
             overflow-x: auto;
             padding: 10px 0 20px 0;
-            /* Scrollbar styling */
             scrollbar-width: thin;
             scrollbar-color: #CBD5E1 #F3F4F6;
         }
 
-        .equation-scroll-wrapper::-webkit-scrollbar {
-            height: 8px;
-        }
+        .equation-scroll-wrapper::-webkit-scrollbar { height: 8px; }
+        .equation-scroll-wrapper::-webkit-scrollbar-track { background: #F3F4F6; border-radius: 4px; }
+        .equation-scroll-wrapper::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
 
-        .equation-scroll-wrapper::-webkit-scrollbar-track {
-            background: #F3F4F6;
-            border-radius: 4px;
-        }
-
-        .equation-scroll-wrapper::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 4px;
-        }
-
-        /* Papan Persamaan (Equation Board) */
+        /* Papan Persamaan Dasar */
         .equation-board {
             display: flex;
-            flex-wrap: nowrap; /* Memaksa tetap menyamping / tidak turun ke bawah */
+            flex-wrap: nowrap;
             justify-content: center;
             align-items: stretch;
             gap: 15px;
-            width: max-content; /* Membiarkan elemen melebar melewati kontainer jika perlu */
+            width: max-content;
             margin: 0 auto;
             padding: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* KELAS KHUSUS MOBILE LAYOUT (Tersusun ke Bawah) */
+        .equation-board.mobile-mode {
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .equation-board.mobile-mode .fraction-card {
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .equation-board.mobile-mode .operator-column {
+            flex-direction: row;
+            padding: 5px 0;
+            height: auto;
+        }
+
+        .equation-board.mobile-mode .op-toggle-group {
+            flex-direction: row;
         }
 
         /* Kartu Pecahan */
@@ -186,13 +238,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             background: #F9FAFB;
-            padding: 25px;
+            padding: 25px 20px;
             border-radius: 16px;
             border: 2px solid var(--border);
-            min-width: 200px;
+            min-width: 220px;
             flex: 1;
+            position: relative;
         }
 
         .fraction-card.result-card {
@@ -201,14 +254,14 @@
         }
 
         .card-label {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: -10px;
+            margin-bottom: -5px;
             white-space: nowrap;
         }
 
@@ -244,46 +297,38 @@
             color: var(--text-main);
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .num-btn:hover {
-            background: var(--border);
-        }
+        .num-btn:active { background: var(--border); }
 
         input[type="number"] {
             width: 50px;
             height: 40px;
             border: none;
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: var(--text-main);
             outline: none;
             background: transparent;
             -moz-appearance: textfield;
         }
-
         input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
         /* Teks Hasil (Result) */
         .result-text-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: var(--text-main);
         }
 
-        /* Kontainer Visual */
         .visual-container {
             display: flex;
             flex-direction: column;
@@ -294,16 +339,16 @@
             justify-content: center;
         }
 
-        /* Operator & Sama Dengan */
+        /* Operator */
         .operator-column {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--text-muted);
-            padding: 0 10px;
+            padding: 0 5px;
         }
 
         .op-toggle-group {
@@ -317,19 +362,19 @@
         }
 
         .op-btn {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border: none;
             background: transparent;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: var(--text-muted);
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
+            line-height: 1;
         }
 
         .op-btn.active {
@@ -338,13 +383,13 @@
             box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
         }
 
-        /* Notifikasi Error & Rincian */
+        /* Pesan Error & Detail */
         .error-message {
             color: var(--danger);
             background: #FEE2E2;
             padding: 12px 20px;
             border-radius: 8px;
-            margin-top: 25px;
+            margin-top: 20px;
             font-weight: 600;
             display: none;
             text-align: center;
@@ -352,8 +397,8 @@
         }
 
         .math-details {
-            margin-top: 25px;
-            font-size: 1.2rem;
+            margin-top: 20px;
+            font-size: 1.1rem;
             color: var(--text-main);
             background: #F8FAFC;
             padding: 15px;
@@ -361,10 +406,11 @@
             border: 2px dashed #CBD5E1;
             text-align: center;
             width: 100%;
+            word-wrap: break-word;
         }
 
         .process-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             color: var(--text-muted);
             text-align: center;
@@ -373,46 +419,48 @@
             padding-top: 20px;
         }
 
-        /* Animasi SVG & Bar */
-        .pop-in {
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
+        /* Animasi SVG */
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn {
             from { opacity: 0; transform: scale(0.8); }
             to { opacity: 1; transform: scale(1); }
         }
 
-        /* Responsif */
+        /* Media Queries Responsif */
         @media (max-width: 900px) {
             .equation-scroll-wrapper {
-                display: flex;
-                justify-content: center;
-            }
-            .equation-board {
-                justify-content: center; /* Tetap rata tengah di layar kecil */
-                margin: 0 auto; 
+                justify-content: flex-start;
             }
         }
 
-        /* Tambahan Responsif khusus untuk tombol serentak di layar kecil */
         @media (max-width: 600px) {
-            .toggle-group {
-                grid-template-columns: 1fr 1fr; /* Berubah jadi 2 baris 2 kolom di HP */
-            }
+            .toggle-group { grid-template-columns: 1fr 1fr; }
+            h1 { font-size: 1.5rem; }
+            .container { padding: 15px; }
+            /* Paksa tampilan mobile pada layar sangat kecil terlepas dari toggle */
+            .equation-scroll-wrapper { overflow-x: hidden; }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <!-- Top Controls: Toggle View & Install PWA -->
+        <div class="top-controls">
+            <button id="btn-toggle-view" class="control-btn" onclick="toggleLayout()">
+                📱 Tampilan Mobile
+            </button>
+            <button id="btn-install" class="control-btn primary-btn">
+                ⬇️ Install Aplikasi
+            </button>
+        </div>
+
         <header>
             <h1>Simulasi Operasi Pecahan Visual</h1>
-            <p class="subtitle">Bentuk visual akan menyesuaikan nilai pecahan dan operasi yang Anda pilih.</p>
+            <p class="subtitle">Visual otomatis menyesuaikan nilai dan operasi pecahan.</p>
         </header>
 
         <main>
-            <!-- Toggle Bentuk Visual Global -->
             <div class="visual-type-selector">
                 <label>Pilih Bentuk Visual Serentak</label>
                 <div class="toggle-group">
@@ -423,9 +471,9 @@
                 </div>
             </div>
 
-            <!-- Wrapper Scroll Horizontal: Mencegah elemen bertumpuk vertikal -->
-            <div class="equation-scroll-wrapper">
-                <div class="equation-board">
+            <!-- Kontainer Persamaan Dinamis -->
+            <div class="equation-scroll-wrapper" id="scroll-wrapper-main">
+                <div class="equation-board" id="main-board">
                     
                     <!-- Kartu Pecahan 1 -->
                     <div class="fraction-card" style="border-color: #A5B4FC;">
@@ -499,19 +547,15 @@
                             <button class="mini-btn toggle-btn-res" id="btn-square-res" onclick="setVisualType('res', 'square')">Persegi</button>
                             <button class="mini-btn toggle-btn-res" id="btn-triangle-res" onclick="setVisualType('res', 'triangle')">Segitiga</button>
                         </div>
-                        <div class="result-text-container" id="result-text">
-                            <!-- Teks hasil dirender via JS -->
-                        </div>
+                        <div class="result-text-container" id="result-text"></div>
                         <div class="visual-container" id="vis-res"></div>
                     </div>
 
                 </div>
             </div>
 
-            <!-- Papan Proses Perhitungan (Ditampilkan Otomatis sesuai operasi) -->
-            <div id="process-visual-container" style="display: none; width: 100%;">
-                <!-- Konten akan diinjeksi oleh JavaScript -->
-            </div>
+            <!-- Papan Proses Perhitungan -->
+            <div id="process-visual-container" style="display: none; width: 100%;"></div>
 
             <!-- Pesan Error & Rincian Proses -->
             <div id="error-msg" class="error-message"></div>
@@ -521,31 +565,117 @@
     </div>
 
     <script>
-        // Variabel Global
+        // --- 1. SETUP PWA (Offline & Install) Berbasis Single File ---
+        function setupSingleFilePWA() {
+            // A. Injeksi Manifest.json secara dinamis untuk memicu PWA Install
+            const manifestJSON = {
+                "name": "Simulasi Pecahan Visual",
+                "short_name": "Pecahan",
+                "start_url": window.location.href,
+                "display": "standalone",
+                "background_color": "#F3F4F6",
+                "theme_color": "#4F46E5",
+                "icons": [{
+                    "src": "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%234F46E5'/%3E%3Ccircle cx='50' cy='30' r='15' fill='white'/%3E%3Crect x='20' y='55' width='60' height='8' fill='white' rx='4'/%3E%3Ccircle cx='50' cy='80' r='15' fill='white'/%3E%3C/svg%3E",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable"
+                }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = URL.createObjectURL(manifestBlob);
+            document.head.appendChild(manifestLink);
+
+            // B. Caching Asset secara langsung ke Cache API (Fallback Offline)
+            if ('caches' in window) {
+                caches.open('pecahan-cache-v1').then(cache => {
+                    cache.add(window.location.href).catch(() => {}); // Cache halaman utama
+                });
+            }
+
+            // C. Injeksi Service Worker via Blob (Mendukung standar offline & prompt instalasi)
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    self.addEventListener('install', e => {
+                        e.waitUntil(caches.open('pecahan-cache-v1').then(c => c.addAll([location.href])));
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+                    });
+                `;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+                    .catch(err => console.log('Notice: Strict origin rules prevented SW Blob registration, fallbacks applied.'));
+            }
+
+            // D. Tangkap event instalasi (A2HS)
+            let deferredPrompt;
+            const installBtn = document.getElementById('btn-install');
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                installBtn.style.display = 'flex'; // Tampilkan tombol instal
+            });
+
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                }
+            });
+        }
+
+        // --- 2. LOGIKA PERALIHAN TAMPILAN (Desktop/Mobile Toggle) ---
+        let isMobileLayout = false;
+        function toggleLayout() {
+            isMobileLayout = !isMobileLayout;
+            const boards = document.querySelectorAll('.equation-board');
+            const wrappers = document.querySelectorAll('.equation-scroll-wrapper');
+            const toggleBtn = document.getElementById('btn-toggle-view');
+
+            boards.forEach(board => {
+                if (isMobileLayout) {
+                    board.classList.add('mobile-mode');
+                } else {
+                    board.classList.remove('mobile-mode');
+                }
+            });
+
+            // Ganti Teks Tombol
+            if (isMobileLayout) {
+                toggleBtn.innerHTML = '💻 Tampilan Desktop';
+            } else {
+                toggleBtn.innerHTML = '📱 Tampilan Mobile';
+            }
+        }
+
+        // --- 3. VARIABEL & LOGIKA SIMULASI PECAHAN ---
         let currentOperator = '+'; 
         let visualType1 = 'pie'; 
         let visualType2 = 'pie'; 
         let visualTypeRes = 'pie'; 
         const MAX_VAL = 20;
 
-        // --- Logika Render Visual (SVG Pie & HTML Bar) ---
-        
+        // Visual Generator
         function generatePieSVG(primaryNum, secondaryNum, den, color1, color2) {
             if (den === 0) return '';
             const totalFilled = primaryNum + secondaryNum;
             const totalPies = Math.max(1, Math.ceil(totalFilled / den));
             const strokeW = Math.min(0.04, 1.5 / den).toFixed(3);
-            
             let html = '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">';
-            let pRem = primaryNum;
-            let sRem = secondaryNum;
+            let pRem = primaryNum, sRem = secondaryNum;
 
             for (let p = 0; p < totalPies; p++) {
-                let svg = `<svg class="pop-in" viewBox="-1.05 -1.05 2.1 2.1" style="width: 80px; height: 80px; transform: rotate(-90deg);">`;
-                
-                // Lingkaran Dasar
+                let svg = `<svg class="pop-in" viewBox="-1.05 -1.05 2.1 2.1" style="width: 75px; height: 75px; transform: rotate(-90deg);">`;
                 svg += `<circle cx="0" cy="0" r="1" fill="#E5E7EB" stroke="#1F2937" stroke-width="0.04"/>`;
-
                 let currentAngle = 0;
 
                 const drawSlice = (slices, color) => {
@@ -557,20 +687,14 @@
                         const angleSpan = (slices / den) * 2 * Math.PI;
                         const startAngle = currentAngle;
                         const endAngle = currentAngle + angleSpan;
-                        
-                        const x1 = Math.cos(startAngle);
-                        const y1 = Math.sin(startAngle);
-                        const x2 = Math.cos(endAngle);
-                        const y2 = Math.sin(endAngle);
-                        
+                        const x1 = Math.cos(startAngle), y1 = Math.sin(startAngle);
+                        const x2 = Math.cos(endAngle), y2 = Math.sin(endAngle);
                         const largeArc = (slices / den) > 0.5 ? 1 : 0;
-                        
                         svg += `<path d="M 0 0 L ${x1} ${y1} A 1 1 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${color}" />`;
                         currentAngle = endAngle;
                     }
                 };
 
-                // Gambar warna
                 let pSlicesInThisPie = Math.min(pRem, den);
                 drawSlice(pSlicesInThisPie, color1);
                 pRem -= pSlicesInThisPie;
@@ -579,17 +703,12 @@
                 drawSlice(sSlicesInThisPie, color2);
                 sRem -= sSlicesInThisPie;
 
-                // Gambar Garis Pembagi
                 for (let i = 0; i < den; i++) {
                     const angle = (i / den) * 2 * Math.PI;
-                    const x = Math.cos(angle);
-                    const y = Math.sin(angle);
+                    const x = Math.cos(angle), y = Math.sin(angle);
                     svg += `<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="#1F2937" stroke-width="${strokeW}" />`;
                 }
-
-                // Garis Pinggir Luar
-                svg += `<circle cx="0" cy="0" r="1" fill="none" stroke="#1F2937" stroke-width="0.04"/>`;
-                svg += `</svg>`;
+                svg += `<circle cx="0" cy="0" r="1" fill="none" stroke="#1F2937" stroke-width="0.04"/></svg>`;
                 html += svg;
             }
             html += '</div>';
@@ -598,12 +717,9 @@
 
         function generateBarHTML(primaryNum, secondaryNum, den, color1, color2) {
             if (den === 0) return '';
-            const totalFilled = primaryNum + secondaryNum;
-            const totalBars = Math.max(1, Math.ceil(totalFilled / den));
-            
+            const totalBars = Math.max(1, Math.ceil((primaryNum + secondaryNum) / den));
             let html = '<div style="display:flex; flex-direction:column; gap:8px; width:100%; align-items:center;">';
-            let pRem = primaryNum;
-            let sRem = secondaryNum;
+            let pRem = primaryNum, sRem = secondaryNum;
 
             for (let b = 0; b < totalBars; b++) {
                 html += `<div class="pop-in" style="display:flex; width:100%; max-width:140px; height:35px; border:2px solid #1F2937; border-radius:6px; overflow:hidden; background:#E5E7EB;">`;
@@ -611,7 +727,6 @@
                     let bg = 'transparent';
                     if (pRem > 0) { bg = color1; pRem--; }
                     else if (sRem > 0) { bg = color2; sRem--; }
-                    
                     let borderRight = (s < den - 1) ? `1px solid rgba(0,0,0,${den > 40 ? 0.1 : 0.3})` : 'none';
                     html += `<div style="flex:1; background:${bg}; border-right:${borderRight};"></div>`;
                 }
@@ -623,27 +738,21 @@
 
         function generateSquareHTML(primaryNum, secondaryNum, den, color1, color2) {
             if (den === 0) return '';
-            const totalFilled = primaryNum + secondaryNum;
-            const totalSquares = Math.max(1, Math.ceil(totalFilled / den));
-            
-            // Cari faktor pembentuk kisi (grid) untuk persegi
+            const totalSquares = Math.max(1, Math.ceil((primaryNum + secondaryNum) / den));
             let cols = 1;
             for (let i = Math.floor(Math.sqrt(den)); i >= 1; i--) {
                 if (den % i === 0) { cols = i; break; }
             }
             let rows = den / cols;
-
             let html = '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">';
-            let pRem = primaryNum;
-            let sRem = secondaryNum;
+            let pRem = primaryNum, sRem = secondaryNum;
 
             for (let b = 0; b < totalSquares; b++) {
-                html += `<div class="pop-in" style="display:grid; grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr); width:80px; height:80px; border:3px solid #1F2937; border-radius:6px; overflow:hidden; background:#E5E7EB;">`;
+                html += `<div class="pop-in" style="display:grid; grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr); width:75px; height:75px; border:3px solid #1F2937; border-radius:6px; overflow:hidden; background:#E5E7EB;">`;
                 for (let s = 0; s < den; s++) {
                     let bg = 'transparent';
                     if (pRem > 0) { bg = color1; pRem--; }
                     else if (sRem > 0) { bg = color2; sRem--; }
-                    
                     let borderRight = (s % cols !== cols - 1) ? `1px solid rgba(0,0,0,0.3)` : 'none';
                     let borderBottom = (Math.floor(s / cols) !== rows - 1) ? `1px solid rgba(0,0,0,0.3)` : 'none';
                     html += `<div style="background:${bg}; border-right:${borderRight}; border-bottom:${borderBottom}; width:100%; height:100%;"></div>`;
@@ -656,48 +765,34 @@
 
         function generateTriangleSVG(primaryNum, secondaryNum, den, color1, color2) {
             if (den === 0) return '';
-            const totalFilled = primaryNum + secondaryNum;
-            const totalTriangles = Math.max(1, Math.ceil(totalFilled / den));
-
+            const totalTriangles = Math.max(1, Math.ceil((primaryNum + secondaryNum) / den));
             let html = '<div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">';
-            let pRem = primaryNum;
-            let sRem = secondaryNum;
+            let pRem = primaryNum, sRem = secondaryNum;
 
             for (let t = 0; t < totalTriangles; t++) {
-                let svg = `<svg class="pop-in" viewBox="0 0 100 100" style="width: 80px; height: 80px; overflow: visible;">`;
-                
-                // Latar belakang segitiga utama (kosong)
+                let svg = `<svg class="pop-in" viewBox="0 0 100 100" style="width: 75px; height: 75px; overflow: visible;">`;
                 svg += `<polygon points="50,0 0,100 100,100" fill="#E5E7EB" />`;
-
                 for (let s = 0; s < den; s++) {
                     let fill = 'transparent';
                     if (pRem > 0) { fill = color1; pRem--; }
                     else if (sRem > 0) { fill = color2; sRem--; }
-
                     if (fill !== 'transparent') {
-                        let x1 = (s / den) * 100;
-                        let x2 = ((s + 1) / den) * 100;
+                        let x1 = (s / den) * 100, x2 = ((s + 1) / den) * 100;
                         svg += `<polygon points="50,0 ${x1},100 ${x2},100" fill="${fill}" />`;
                     }
                 }
-
-                // Gambar Garis Pemisah
                 for (let s = 1; s < den; s++) {
                     let x = (s / den) * 100;
                     svg += `<line x1="50" y1="0" x2="${x}" y2="100" stroke="#1F2937" stroke-width="1.5" />`;
                 }
-
-                // Gambar Garis Bingkai Segitiga Utama
-                svg += `<polygon points="50,0 0,100 100,100" fill="none" stroke="#1F2937" stroke-width="3" stroke-linejoin="round"/>`;
-                svg += `</svg>`;
+                svg += `<polygon points="50,0 0,100 100,100" fill="none" stroke="#1F2937" stroke-width="3" stroke-linejoin="round"/></svg>`;
                 html += svg;
             }
             html += '</div>';
             return html;
         }
 
-        // --- Logika Kontrol ---
-
+        // Aksi Pengguna
         function setVisualType(cardIndex, type, skipSimulation = false) {
             if (cardIndex === 1) visualType1 = type;
             else if (cardIndex === 2) visualType2 = type;
@@ -740,8 +835,7 @@
         }
 
         function getGCD(a, b) {
-            a = Math.abs(a);
-            b = Math.abs(b);
+            a = Math.abs(a); b = Math.abs(b);
             while (b) { let temp = b; b = a % b; a = temp; }
             return a;
         }
@@ -761,7 +855,6 @@
             document.getElementById('process-visual-container').style.display = 'none';
         }
 
-        // --- Fungsi Utama Simulasi ---
         function runSimulation() {
             document.getElementById('error-msg').style.display = 'none';
 
@@ -771,17 +864,11 @@
             const d2 = parseInt(document.getElementById('den2').value);
 
             if (isNaN(n1) || isNaN(d1) || isNaN(n2) || isNaN(d2)) return;
-            if (d1 === 0 || d2 === 0) {
-                showError("Penyebut tidak boleh angka 0!");
-                return;
-            }
-            if (currentOperator === '/' && n2 === 0) {
-                showError("Pembagi (Pecahan 2) tidak boleh bernilai 0!");
-                return;
-            }
+            if (d1 === 0 || d2 === 0) return showError("Penyebut tidak boleh angka 0!");
+            if (currentOperator === '/' && n2 === 0) return showError("Pembagi (Pecahan 2) tidak boleh bernilai 0!");
 
-            const color1 = '#4F46E5'; // Indigo (Pecahan 1)
-            const color2 = '#10B981'; // Emerald (Pecahan 2)
+            const color1 = '#4F46E5'; 
+            const color2 = '#10B981'; 
             
             const getVisualizer = (type) => {
                 if (type === 'pie') return generatePieSVG;
@@ -795,192 +882,154 @@
             const visualizer2 = getVisualizer(visualType2);
             const visualizerRes = getVisualizer(visualTypeRes);
             
-            // Render Visual Asli di Input (Papan Atas)
             document.getElementById('vis1').innerHTML = visualizer1(n1, 0, d1, color1, null);
             document.getElementById('vis2').innerHTML = visualizer2(n2, 0, d2, color2, null);
 
-            // Perhitungan KPK
             const commonDenom = getLCM(d1, d2);
             const eqN1 = n1 * (commonDenom / d1);
             const eqN2 = n2 * (commonDenom / d2);
 
-            let resN = 0;
-            let resD = commonDenom;
+            let resN = 0, resD = commonDenom;
             let opSign = currentOperator === '+' ? '+' : currentOperator === '-' ? '−' : currentOperator === '*' ? '×' : '÷';
 
             if (currentOperator === '+') {
                 resN = eqN1 + eqN2;
                 document.getElementById('vis-res').innerHTML = visualizerRes(eqN1, eqN2, resD, color1, color2);
             } else if (currentOperator === '-') {
-                if (eqN1 < eqN2) {
-                    showError("Pecahan 1 harus lebih besar dari Pecahan 2 (menghindari hasil negatif).");
-                    return;
-                }
+                if (eqN1 < eqN2) return showError("Pecahan 1 harus lebih besar dari Pecahan 2 (menghindari hasil negatif).");
                 resN = eqN1 - eqN2;
                 document.getElementById('vis-res').innerHTML = visualizerRes(resN, 0, resD, color1, null);
             } else if (currentOperator === '*') {
-                resN = n1 * n2;
-                resD = d1 * d2;
+                resN = n1 * n2; resD = d1 * d2;
                 document.getElementById('vis-res').innerHTML = visualizerRes(resN, 0, resD, color1, null);
             } else if (currentOperator === '/') {
-                resN = n1 * d2;
-                resD = d1 * n2;
+                resN = n1 * d2; resD = d1 * n2;
                 document.getElementById('vis-res').innerHTML = visualizerRes(resN, 0, resD, color1, null);
             }
 
-            // Render Teks Pecahan Hasil Akhir
             document.getElementById('result-text').innerHTML = `
                 <div>${resN}</div>
                 <div class="fraction-line"></div>
                 <div>${resD}</div>
             `;
 
-            // --- Render Bagian "Proses Visual" ---
+            // Proses Visual Render
             const processContainer = document.getElementById('process-visual-container');
+            const layoutClass = isMobileLayout ? 'mobile-mode' : '';
             
             if (currentOperator === '+' || currentOperator === '-') {
                 if (d1 !== d2) {
                     processContainer.style.display = 'block';
-                    let processHtml = `
+                    processContainer.innerHTML = `
                         <div class="process-title">👇 Proses Visual: Menyamakan Penyebut (KPK dari ${d1} dan ${d2} adalah ${commonDenom}) 👇</div>
                         <div class="equation-scroll-wrapper">
-                            <div class="equation-board">
-                                <!-- Proses Pecahan 1 -->
+                            <div class="equation-board ${layoutClass}">
                                 <div class="fraction-card" style="border-color: #A5B4FC; background: #EEF2FF;">
                                     <span class="card-label" style="background: var(--primary);">Pecahan 1 (Disamakan)</span>
                                     <div class="result-text-container" style="margin-top:10px;">
-                                        <div>${eqN1}</div>
-                                        <div class="fraction-line"></div>
-                                        <div>${commonDenom}</div>
+                                        <div>${eqN1}</div><div class="fraction-line"></div><div>${commonDenom}</div>
                                     </div>
-                                    <div class="visual-container">
-                                        ${visualizer1(eqN1, 0, commonDenom, color1, null)}
-                                    </div>
+                                    <div class="visual-container">${visualizer1(eqN1, 0, commonDenom, color1, null)}</div>
                                 </div>
-
                                 <div class="operator-column">${opSign}</div>
-
-                                <!-- Proses Pecahan 2 -->
                                 <div class="fraction-card" style="border-color: #6EE7B7; background: #ECFDF5;">
                                     <span class="card-label" style="background: var(--secondary);">Pecahan 2 (Disamakan)</span>
                                     <div class="result-text-container" style="margin-top:10px;">
-                                        <div>${eqN2}</div>
-                                        <div class="fraction-line"></div>
-                                        <div>${commonDenom}</div>
+                                        <div>${eqN2}</div><div class="fraction-line"></div><div>${commonDenom}</div>
                                     </div>
-                                    <div class="visual-container">
-                                        ${visualizer2(eqN2, 0, commonDenom, color2, null)}
-                                    </div>
+                                    <div class="visual-container">${visualizer2(eqN2, 0, commonDenom, color2, null)}</div>
                                 </div>
-
                                 <div class="operator-column">=</div>
-
-                                <!-- Hasil Gabungan -->
                                 <div class="fraction-card result-card">
                                     <span class="card-label" style="background: #F59E0B;">Hasil Gabungan</span>
                                     <div class="result-text-container" style="margin-top:10px;">
-                                        <div>${resN}</div>
-                                        <div class="fraction-line"></div>
-                                        <div>${commonDenom}</div>
+                                        <div>${resN}</div><div class="fraction-line"></div><div>${commonDenom}</div>
                                     </div>
                                     <div class="visual-container">
-                                        ${currentOperator === '+' 
-                                            ? visualizerRes(eqN1, eqN2, commonDenom, color1, color2) 
-                                            : visualizerRes(resN, 0, commonDenom, color1, null)}
+                                        ${currentOperator === '+' ? visualizerRes(eqN1, eqN2, commonDenom, color1, color2) : visualizerRes(resN, 0, commonDenom, color1, null)}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     `;
-                    processContainer.innerHTML = processHtml;
-                } else {
-                    processContainer.style.display = 'none';
-                }
+                } else { processContainer.style.display = 'none'; }
             } else if (currentOperator === '*') {
                 processContainer.style.display = 'block';
-                let processHtml = `
+                processContainer.innerHTML = `
                     <div class="process-title">👇 Proses: Kalikan Pembilang dengan Pembilang, Penyebut dengan Penyebut 👇</div>
                     <div class="equation-scroll-wrapper">
-                        <div class="equation-board" style="align-items: center; color: var(--text-main);">
+                        <div class="equation-board ${layoutClass}" style="align-items: center;">
                             <div class="fraction-card" style="padding: 15px; background: #EEF2FF; border-color: #A5B4FC; max-width: 250px;">
                                 <div class="result-text-container">
-                                    <div>${n1} &times; ${n2}</div>
-                                    <div class="fraction-line"></div>
-                                    <div>${d1} &times; ${d2}</div>
+                                    <div>${n1} &times; ${n2}</div><div class="fraction-line"></div><div>${d1} &times; ${d2}</div>
                                 </div>
                             </div>
                             <div class="operator-column">=</div>
                             <div class="fraction-card result-card" style="padding: 15px; max-width: 200px;">
                                 <div class="result-text-container">
-                                    <div>${resN}</div>
-                                    <div class="fraction-line"></div>
-                                    <div>${resD}</div>
+                                    <div>${resN}</div><div class="fraction-line"></div><div>${resD}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-                processContainer.innerHTML = processHtml;
             } else if (currentOperator === '/') {
                 processContainer.style.display = 'block';
-                let processHtml = `
+                processContainer.innerHTML = `
                     <div class="process-title">👇 Proses: Ubah Pembagian menjadi Perkalian Silang (Balik Pecahan 2) 👇</div>
                     <div class="equation-scroll-wrapper">
-                        <div class="equation-board" style="align-items: center; color: var(--text-main);">
+                        <div class="equation-board ${layoutClass}" style="align-items: center;">
                             <div class="fraction-card" style="padding: 15px; background: #EEF2FF; border-color: #A5B4FC; max-width: 150px;">
                                 <div class="result-text-container">
-                                    <div>${n1}</div>
-                                    <div class="fraction-line"></div>
-                                    <div>${d1}</div>
+                                    <div>${n1}</div><div class="fraction-line"></div><div>${d1}</div>
                                 </div>
                             </div>
                             <div class="operator-column">&times;</div>
                             <div class="fraction-card" style="padding: 15px; background: #ECFDF5; border-color: #6EE7B7; max-width: 150px; position: relative;">
                                 <span style="position: absolute; top: -12px; font-size: 0.75rem; background: var(--secondary); color: white; padding: 2px 10px; border-radius: 10px; font-weight: bold;">DIBALIK</span>
                                 <div class="result-text-container">
-                                    <div style="color: var(--danger);">${d2}</div>
-                                    <div class="fraction-line"></div>
-                                    <div style="color: var(--danger);">${n2}</div>
+                                    <div style="color: var(--danger);">${d2}</div><div class="fraction-line"></div><div style="color: var(--danger);">${n2}</div>
                                 </div>
                             </div>
                             <div class="operator-column">=</div>
                             <div class="fraction-card result-card" style="padding: 15px; max-width: 150px;">
                                 <div class="result-text-container">
-                                    <div>${resN}</div>
-                                    <div class="fraction-line"></div>
-                                    <div>${resD}</div>
+                                    <div>${resN}</div><div class="fraction-line"></div><div>${resD}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
-                processContainer.innerHTML = processHtml;
             }
 
-            // Tampilkan rincian perhitungan teks di bawah
             let detailHTML = `<b>Rumus:</b> &nbsp; ${n1}/${d1} ${opSign} ${n2}/${d2}`;
-            
-            if (currentOperator === '+' || currentOperator === '-') {
-                if (d1 !== d2) {
-                    detailHTML += ` &nbsp; = &nbsp; <b>(</b><span style="color:${color1}">${eqN1}/${commonDenom}</span> ${opSign} <span style="color:${color2}">${eqN2}/${commonDenom}</span><b>)</b>`;
-                }
+            if ((currentOperator === '+' || currentOperator === '-') && d1 !== d2) {
+                detailHTML += ` &nbsp; = &nbsp; <b>(</b><span style="color:${color1}">${eqN1}/${commonDenom}</span> ${opSign} <span style="color:${color2}">${eqN2}/${commonDenom}</span><b>)</b>`;
             } else if (currentOperator === '*') {
                 detailHTML += ` &nbsp; = &nbsp; <b>(</b>${n1} &times; ${n2}<b>)</b> / <b>(</b>${d1} &times; ${d2}<b>)</b>`;
             } else if (currentOperator === '/') {
                 detailHTML += ` &nbsp; = &nbsp; <span style="color:${color1}">${n1}/${d1}</span> &times; <span style="color:var(--danger)">${d2}/${n2}</span>`;
             }
-            
             detailHTML += ` &nbsp; = &nbsp; <b>${resN}/${resD}</b>`;
 
             const gcdRes = getGCD(resN, resD);
             if (gcdRes > 1 && resN > 0) {
-                detailHTML += ` &nbsp; <br><span style="font-size:1.1rem; color:var(--text-muted)">Hasil Disederhanakan:</span> &nbsp; <b style="color:var(--secondary)">${resN/gcdRes}/${resD/gcdRes}</b>`;
+                detailHTML += ` &nbsp; <br><span style="font-size:1rem; color:var(--text-muted)">Disederhanakan:</span> &nbsp; <b style="color:var(--secondary)">${resN/gcdRes}/${resD/gcdRes}</b>`;
             }
-
             document.getElementById('math-details').innerHTML = detailHTML;
         }
 
+        // INIT SAAT DIMUAT
         window.onload = function() {
+            // Setup Caching & PWA
+            setupSingleFilePWA();
+            
+            // Auto Deteksi HP
+            if (window.innerWidth <= 768) {
+                toggleLayout();
+            }
+            
+            // Jalan simulasi
             runSimulation();
         };
     </script>
