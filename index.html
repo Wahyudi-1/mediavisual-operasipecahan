@@ -437,8 +437,11 @@
             .toggle-group { grid-template-columns: 1fr 1fr; }
             h1 { font-size: 1.5rem; }
             .container { padding: 15px; }
-            /* Paksa tampilan mobile pada layar sangat kecil terlepas dari toggle */
-            .equation-scroll-wrapper { overflow-x: hidden; }
+            /* Memastikan scroll horizontal tetap aktif & mulus jika beralih ke mode desktop di HP */
+            .equation-scroll-wrapper { 
+                overflow-x: auto; 
+                -webkit-overflow-scrolling: touch; 
+            }
         }
     </style>
 </head>
